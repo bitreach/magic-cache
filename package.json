@@ -2,11 +2,11 @@
   "name": "magic-cache",
   "version": "0.0.1",
   "description": "Magic Cache",
-  "main": "dist/src/index",
+  "main": "dist/index",
   "scripts": {
     "build": "tsc",
     "deploy": "yarn build && (yarn deploy:app)",
-    "start": "node ./dist/src/index",
+    "start": "node ./dist/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts"
   },
