@@ -8,6 +8,7 @@ export const supabaseClient = createClient(
 );
 
 export const getUserFromJWT = async (token: string) => {
+  if (!token) return null;
   const res = await supabaseClient.auth.getUser(token.replace("Bearer ", ""));
   return res.data.user;
 };
