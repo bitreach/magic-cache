@@ -24,14 +24,19 @@ export const isValidAPIKey = async function (receivedAPIKey:string) {
             return false
         }
         else{
-            if (data.length === 0) {
+            if (data.length === 0 ) {
               return false
             }
             const isAuthenticated = data[0].api_key === receivedAPIKey
             if (!isAuthenticated) {
               return false
             }
-            const developerID = data[0].api_key_developer[0].developer_id
+            let developerID;
+            if (Array.isArray(data[0].api_key_developer)) {
+              developerID = data[0].api_key_developer[0]?.developer_id
+            } else {
+              developerID = data[0].api_key_developer?.developer_id
+            }
             return developerID
         }
     }catch(err){
