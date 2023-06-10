@@ -7,7 +7,7 @@ import {
   InternalError,
   UnauthenticatedError,
 } from "../../common/errors/api_error";
-import { getUserFromJWT, supabaseClient } from "../../lib/supabase";
+import { getUserFromJWT, supabaseClient, isValidAPIKey } from "../../lib/supabase";
 import { EmbeddingHelper } from "../../helpers/embedding_helper";
 dotenv.config();
 
@@ -21,11 +21,22 @@ type Payload = z.infer<typeof payloadSchema>;
 
 export default async (req: express.Request, res: express.Response) => {
   try {
-    const user = await getUserFromJWT(req.headers.authorization as string);
-    if (!user)
-      throw new UnauthenticatedError(
-        "Expecting a valid JWT token in the Authorization header."
-      );
+    if (!req || !req.headers || !req.headers.authorization) {
+      console.log(req.headers)
+      return res.status(401).json({error:"Failed to authenticate"})
+    }
+    const receivedAPIKey = req.headers.authorization.split(' ')[1]
+    const userID = await isValidAPIKey(receivedAPIKey) 
+    if (!userID){
+      throw new UnauthenticatedError("Invalid API Key");
+    }
+
+    // need to get the user id from the api key
+    // const user = await getUserFromJWT(req.headers.authorization as string);
+    // if (!user)
+    //   throw new UnauthenticatedError(
+    //     "Expecting a valid JWT token in the Authorization header."
+    //   );
 
     const zodRes = payloadSchema.safeParse(req.body);
     if (!zodRes.success)
@@ -46,7 +57,7 @@ export default async (req: express.Request, res: express.Response) => {
       prompt: payload.prompt,
       completion: payload.completion,
       prompt_embedding: promptEmbedding,
-      user_id: user.id,
+      user_id: userID,
     });
 
     if (error) throw new InternalError(error.message);

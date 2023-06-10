@@ -10,7 +10,7 @@ import {
   UnauthenticatedError,
 } from "../../common/errors/api_error";
 import { EmbeddingHelper } from "../../helpers/embedding_helper";
-import { getUserFromJWT, supabaseClient } from "../../lib/supabase";
+import { getUserFromJWT, supabaseClient, isValidAPIKey } from "../../lib/supabase";
 
 dotenv.config();
 
@@ -28,13 +28,21 @@ type Payload = z.infer<typeof payloadSchema>;
 
 export default async (req: express.Request, res: express.Response) => {
   try {
-    const user = await getUserFromJWT(req.headers.authorization as string);
-    if (!user)
-      throw new UnauthenticatedError(
-        "Expecting a valid JWT token in the Authorization header."
-      );
+    if (!req || !req.headers || !req.headers.authorization) {
+      return res.status(401).json({error:"Failed to authenticate"})
+    }
+    const receivedAPIKey = req.headers.authorization.split(' ')[1]
+    const userID = await isValidAPIKey(receivedAPIKey) 
+    if (!userID){
+      throw new UnauthenticatedError("Invalid API Key");
+    }
+    // const user = await getUserFromJWT(req.headers.authorization as string);
+    // if (!user)
+    //   throw new UnauthenticatedError(
+    //     "Expecting a valid JWT token in the Authorization header."
+    //   );
 
-    const zodRes = payloadSchema.safeParse(req.query);
+    const zodRes = payloadSchema.safeParse(req.body);
     if (!zodRes.success)
       throw new BadRequestError(
         zodRes.error.errors
@@ -58,7 +66,7 @@ export default async (req: express.Request, res: express.Response) => {
         query_embedding: promptEmbedding,
         match_threshold: payload.similarity_threshold, // Similarity threshold
         match_count: 10, // Number of match
-        auth_user_id: user.id,
+        auth_user_id: userID
       }
     );
 
