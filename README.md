@@ -18,7 +18,7 @@ You should see a long API key like the below:
 25a52459-ggda-04d3-a3e8-160b23902b5z4
 ```
 
-### Add a completion
+### Post a completion
 
 ```
 curl --location --request POST 'https://magic-cache.herokuapp.com/cache/' \
@@ -37,6 +37,7 @@ Example Response
     "success": true
 }
 ```
+### Search for matching completions
 
 ```
 curl --location --request GET 'https://magic-cache.herokuapp.com/cache/' \
