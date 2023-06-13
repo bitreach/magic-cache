@@ -8,7 +8,7 @@ You can customise the similarity threshold from 0 and 1 to find how exact you wa
 
 ## Sign in to Magic Cache 
 
-Go to [magiccache](), signup/login 
+Go to [magiccache](https://cache.scalingdevtools.com/) & signup/login 
 
 ## Copy your server API key and app ID
 
@@ -60,3 +60,14 @@ Example Response:
 ]
 ```
 
+### Self hosting
+
+You can alternatively self host this yourself
+
+Use the below variables
+```
+PORT=
+OPENAI_API_KEY=
+SUPABASE_URL=
+SUPABASE_SERVICE_KEY=
+```
